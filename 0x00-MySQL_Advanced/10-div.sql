@@ -1,15 +1,17 @@
 -- safe division
 
 DELIMITER //
-
-CREATE PROCEDURE SafeDiv(IN a INT, IN b INT, OUT result INT)
+CREATE FUNCTION SafeDiv(a INT, b INT)
+RETURNS FLOAT DETERMINISTIC
 BEGIN
+    DECLARE result FLOAT;
     IF b = 0 THEN
         SET result = 0;
     ELSE
         SET result = a / b;
     END IF;
-END //
+    RETURN result;
+END;
 
+//
 DELIMITER ;
-
