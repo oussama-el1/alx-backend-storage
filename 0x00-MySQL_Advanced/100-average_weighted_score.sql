@@ -8,7 +8,7 @@ BEGIN
     DECLARE avg_weighted_score FLOAT;
 
     -- Calculate average weighted score
-    SELECT AVG(corrections.score * projects.weight)
+    SELECT SUM(corrections.score * projects.weight) / SUM(projects.weight)
     INTO avg_weighted_score
     FROM corrections
     INNER JOIN projects ON corrections.project_id = projects.id
