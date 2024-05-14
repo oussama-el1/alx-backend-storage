@@ -1,1 +1,2 @@
-cat 1-use_or_create_database | mongo
+// use database
+use my_db
