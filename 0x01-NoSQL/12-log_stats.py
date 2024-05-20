@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """ Logs Nginx from MongoDB and prints stats
 """
-import pymongo
+from pymongo import MongoClient
 
 
 def stats():
 	""" stats function """
-	collection = pymongo.MongoClient().logs.nginx
+	client = MongoClient('mongodb://127.0.0.1:27017')
+	collection = client.logs.nginx
 	print(f"{collection.count_documents({})} logs")
 	print("Methods:")
 	methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
