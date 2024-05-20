@@ -12,12 +12,11 @@ def stats():
 	print("Methods:")
 	methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 	for method in methods:
-		req_count = len(list(collection.find({'method': method})))
-		print('\tmethod {}: {}'.format(method, req_count))
-	status_checks_count = len(list(
-		collection.find({'method': 'GET', 'path': '/status'})
-	))
-	print('{} status check'.format(status_checks_count))
+		count = collection.count_documents({"method": method})
+		print(f"\tmethod {method}: {count}")
+	status_get = collection.count_documents({'method': 'GET', 'path': '/status'})
+	print(f"{status_get} status check")
+
 
 if __name__ == "__main__":
 	stats()
