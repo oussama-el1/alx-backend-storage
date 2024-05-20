@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-""" Logs Nginx from MongoDB and prints stats """
-import pymongo
+""" Logs Nginx from MongoDB and prints stats
+"""
 
-
+from pymongo import MongoClient 
 
 def stats():
-  """ logs for Nginx from MongoDB and prints stats """
-  collection = pymongo.MongoClient().logs.nginx
-  print(f"{collection.count_documents({})} logs")
-  print("Methods:")
-  methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-  for method in methods:
-    count = collection.count_documents({"method": method})
-    print(f"\tmethod {method}: {count}")
-  print(f"{collection.count_documents({'method': 'GET', 'path': '/status'})}\
-    status check")
+	collection = MongoClient().logs.nginx
+	print(f"{collection.count_documents({})} logs")
+	print("Methods:")
+	methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+	for method in methods:
+		count = collection.count_documents({"method": method})
+		print(f"\tmethod {method}: {count}")
+	Status_get = collection.count_documents({'method': 'GET', 'path': '/status'})
+	print(f"{Status_get} status check")
 
-
-stats()
+if __name__ == "__main__":
+	stats()
