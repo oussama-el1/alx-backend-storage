@@ -8,9 +8,11 @@ from typing import Union, Callable, Optional, Any
 from functools import wraps
 
 
-def count_calls(f: Optional[Callable] = None) -> Callable:
+def count_calls(f: Callable) -> Callable:
+    """ track the number of calls """
     @wraps(f)
     def wrapper(self, *args, **kwargs) -> Any:
+        """ invoke a f method """
         if isinstance(self._redis, redis.Redis):
             key = f.__qualname__
             self._redis.incr(key)
