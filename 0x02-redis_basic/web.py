@@ -29,6 +29,4 @@ def Mydecorator(fun: Callable) -> Callable:
 def get_page(url: str) -> str:
     """ Implementing an expiring web cache and tracker """
     response = requests.get(url)
-    if response.status_code == 200:
-        content = response.text
-        return content
+    return response.text
