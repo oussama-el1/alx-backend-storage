@@ -15,9 +15,13 @@ def Mydecorator(fun: Callable) -> Callable:
         """ wrapper for a get page function """
         client = redis.Redis()
         client.incr(f'count:{url}')
-        client.expire(f'count:{url}', 10)
+        cached_page = client.get(f'{url}')
+        if cached_page:
+            return cached_page.decode('utf-8')
+        page = fun(url)
+        client.setex(f'{url}',10, page)
 
-        return fun(url)
+        return page
     return wrapper
 
 
