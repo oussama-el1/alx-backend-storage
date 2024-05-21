@@ -11,12 +11,33 @@ from functools import wraps
 def count_calls(method: Callable) -> Callable:
     """ Tracks the number of calls made to a method in a Cache class. """
     @wraps(method)
-    def invoker(self, *args, **kwargs) -> Any:
+    def wrapper(self, *args, **kwargs) -> Any:
         """Invokes the given method after incrementing its call counter."""
         if isinstance(self._redis, redis.Redis):
             self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
-    return invoker
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """ store the inputs and outputs """
+    @wraps(method)
+    def wrapper(self, *args) -> Any:
+        """ invoke the given methods after add """
+        if isinstance(self._redis, redis.Redis):
+            methodname = method.__qualname__
+            keyin = methodname + ':inputs'
+            keyout = methodname + ':outputs'
+
+            inputs = str(args)
+            self._redis.rpush(keyin, inputs)
+
+            out = method(self, *args)
+            self._redis.rpush(keyout, out)
+
+        return out
+
+    return wrapper
 
 
 class Cache:
@@ -27,6 +48,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Store the given data in Redis using a randomly
