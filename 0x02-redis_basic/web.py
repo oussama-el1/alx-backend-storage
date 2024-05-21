@@ -19,7 +19,7 @@ def Mydecorator(fun: Callable) -> Callable:
         if cached_page:
             return cached_page.decode('utf-8')
         page = fun(url)
-        client.setex(f'{url}',10, page)
+        client.set(f'{url}', page, 10)
 
         return page
     return wrapper
