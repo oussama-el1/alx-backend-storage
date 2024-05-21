@@ -8,21 +8,19 @@ from typing import Union, Callable, Optional, Any
 from functools import wraps
 
 
-def count_calls(f: Callable) -> Callable:
-    """ track the number of calls """
-    @wraps(f)
-    def wrapper(self, *args, **kwargs) -> Any:
-        """ invoke a f method """
+def count_calls(method: Callable) -> Callable:
+    """ Tracks the number of calls made to a method in a Cache class. """
+    @wraps(method)
+    def invoker(self, *args, **kwargs) -> Any:
+        """Invokes the given method after incrementing its call counter."""
         if isinstance(self._redis, redis.Redis):
-            key = f.__qualname__
-            self._redis.incr(key)
-        return f(self, *args, **kwargs)
-    return wrapper
+            self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+    return invoker
 
 
 class Cache:
     """ Cache class to create instance for Redis client """
-
     def __init__(self):
         """Initialize the Cache instance and create a private Redis client."""
         self._redis = redis.Redis()
