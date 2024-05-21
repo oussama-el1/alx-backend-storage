@@ -1,32 +1,36 @@
 #!/usr/bin/env python3
 """
-Implementing an expiring web cache and tracker
+Caching request module
 """
-import requests
-from typing import Callable
-from functools import wraps
 import redis
+import requests
+from functools import wraps
+from typing import Callable
 
 
-def Mydecorator(fun: Callable) -> Callable:
-    """ Track a web page """
-    @wraps(fun)
-    def wrapper(url):
-        """ wrapper for a get page function """
+def track_get_page(fn: Callable) -> Callable:
+    """ Decorator for get_page
+    """
+    @wraps(fn)
+    def wrapper(url: str) -> str:
+        """ Wrapper that:
+            - check whether a url's data is cached
+            - tracks how many times get_page is called
+        """
         client = redis.Redis()
         client.incr(f'count:{url}')
         cached_page = client.get(f'{url}')
         if cached_page:
             return cached_page.decode('utf-8')
-        page = fun(url)
-        client.set(f'{url}', page, 10)
-
-        return page
+        response = fn(url)
+        client.set(f'{url}', response, 10)
+        return response
     return wrapper
 
 
-@Mydecorator
+@track_get_page
 def get_page(url: str) -> str:
-    """ Implementing an expiring web cache and tracker """
+    """ Makes a http request to a given endpoint
+    """
     response = requests.get(url)
     return response.text
