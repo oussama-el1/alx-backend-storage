@@ -4,7 +4,18 @@ Redis task 1
 """
 from uuid import uuid4
 import redis
-from typing import Union, Callable, Optional
+from typing import Union, Callable, Optional, Any
+from functools import wraps
+
+
+def count_calls(f: Optional[Callable] = None) -> Callable:
+    @wraps(f)
+    def wrapper(self, *args, **kwargs) -> Any:
+        if isinstance(self._redis, redis.Redis):
+            key = f.__qualname__
+            self._redis.incr(key)
+        return f(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -15,6 +26,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Store the given data in Redis using a randomly
